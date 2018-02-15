@@ -15,14 +15,25 @@ class Binance(Exchange):
     # def close_column_name():
     #     return 'close'
 
-    def get_data(self, ticker, from_date, end_date):
+    def get_data(self, ticker, from_date, end_date, interval=Client.KLINE_INTERVAL_1HOUR):
 
         if len(ticker) == 0:
             raise Exception('ticker is invalid')
 
-        base_coin = ticker[:3]
-        alt_coin = ticker[3:]
-        return self.get_klines(base_coin=base_coin, alt_coin=alt_coin, start_date=from_date, end_date=end_date)
+        if isinstance(ticker, str):
+            base_coin = ticker[:3]
+            alt_coin = ticker[3:]
+            return self.get_klines(base_coin=base_coin, alt_coin=alt_coin, start_date=from_date, end_date=end_date)
+
+        if isinstance(ticker, list):
+            result = []
+            for t in ticker:
+                base_coin = t[:3]
+                alt_coin = t[3:]
+                result.append(
+                    (t, self.get_klines(base_coin=base_coin, alt_coin=alt_coin, start_date=from_date, end_date=end_date)
+                     ))
+            return result
 
     @staticmethod
     def get_date_string(date_time):
@@ -51,6 +62,15 @@ class Binance(Exchange):
     altCoin = ''
     coin_pair = baseCoin + altCoin
 
+    def getExchangeInfo(self):
+        client = Client(self.key, self.secret)
+        return client.get_exchange_info()
+
+    def get_all_tickers(self):
+        client = Client(self.key, self.secret)
+        tickers = client.get_all_tickers()
+        return pd.DataFrame(tickers)
+
     def __init__(self, key, secret, base_coin="BTC", alt_coin="XRP"):
         super(Binance, self).__init__('Binance')
         self.key = key
@@ -66,7 +86,7 @@ class Binance(Exchange):
                    base_coin='BTC',
                    alt_coin='XRP',
                    localize_time=True,
-                   index_time_column_name='openTime',
+                   index_time_column_name='closeTime',
                    start_date=None,
                    end_date=None):
 
@@ -78,7 +98,7 @@ class Binance(Exchange):
         else:
             start_str = Binance.get_date_string(start_date)
             end_str = Binance.get_date_string(end_date)
-            candles = client.get_historical_klines(symbol=self.coin_pair, interval=Client.KLINE_INTERVAL_1DAY,
+            candles = client.get_historical_klines(symbol=self.coin_pair, interval=period,
                                                    start_str=start_str, end_str=end_str)
 
         df = pd.DataFrame(candles)

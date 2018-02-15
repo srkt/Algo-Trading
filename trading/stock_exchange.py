@@ -14,4 +14,15 @@ class StockExchange(Exchange):
         if not isinstance(from_date, dt.datetime) and not isinstance(end_date, dt.datetime):
             raise Exception('Expected datetime format of datetime.datetime')
 
-        return web.DataReader(ticker, self.source, from_date, end_date)
+        if isinstance(ticker, str):
+            return [(ticker, web.DataReader(ticker, self.source, from_date, end_date))]
+        elif isinstance(ticker, list):
+            output = []
+            for t in ticker:
+                if not isinstance(t, str):
+                    raise Exception('invalid ticker passed')
+                output.append((t, web.DataReader(t, self.source, from_date, end_date)))
+
+            return output
+        else:
+            raise Exception('invalid ticker passed. Expected either string or list')

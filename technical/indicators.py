@@ -90,3 +90,12 @@ def Mean(data, name):
         raise Exception('expected pandas dataframe')
 
     return data[[name]].mean()
+
+
+def get_alphabeta(x, y, degree=1):
+    if (x is None or y is None):
+        raise Exception('invalid parameters passed')
+    print(x)
+    print(y)
+    beta, alpha = np.polyfit(x, y, deg=degree)
+    return alpha, beta

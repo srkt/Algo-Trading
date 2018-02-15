@@ -1,7 +1,7 @@
 from abc import abstractmethod
-import indicators as ind
 import pandas as pd
 import numpy as np
+import technical.indicators as ind
 
 
 class Screener:
@@ -10,6 +10,8 @@ class Screener:
 
     def __init__(self, data):
         self.data = data
+        self.strategies = []
+        self.strategy_results = []
 
     def add_strategy(self, strategy):
         if strategy is None or not isinstance(strategy, Strategy):
@@ -306,9 +308,6 @@ class Rsi(Strategy):
 
         up = diff.apply(lambda x: self.gtzero(x))
         down = diff.apply(lambda x: -self.ltzero(x))
-
-        print(up)
-        print(down)
 
         # up = np.where(diff > 0, diff, 0)
         # down = np.where(diff > 0, 0, -diff)
