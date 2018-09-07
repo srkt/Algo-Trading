@@ -104,18 +104,18 @@ class EmaReversion(Strategy):
 
         strat_result = StrategyResult(self.strategy_name)
 
-        curr_price = self.data[self.name][-1]
+        curr_price = self.data[self.name].iloc[-1]
 
-        if min_sma[-1] > max_sma[-1] and min_sma[-2] < max_sma[-2]:
+        if min_sma.iloc[-1] > max_sma.iloc[-1] and min_sma.iloc[-2] < max_sma.iloc[-2]:
             strat_result.set_buy()
-        elif min_sma[-1] < max_sma[-1] and min_sma[-2] > max_sma[-2]:
+        elif min_sma.iloc[-1] < max_sma.iloc[-1] and min_sma.iloc[-2] > max_sma.iloc[-2]:
             strat_result.set_sell()
-        elif min_sma[-1] > max_sma[-1] and (curr_price > min_sma[-1] or curr_price > max_sma[-1]):
+        elif min_sma.iloc[-1] > max_sma.iloc[-1] and (curr_price > min_sma.iloc[-1] or curr_price > max_sma.iloc[-1]):
             strat_result.set_strategy('watch and buy')
-        elif min_sma[-1] < max_sma[-1] and (curr_price < min_sma[-1] or curr_price < max_sma[-1]):
+        elif min_sma.iloc[-1] < max_sma.iloc[-1] and (curr_price < min_sma.iloc[-1] or curr_price < max_sma.iloc[-1]):
             strat_result.set_strategy('sell')
 
-        wt = (curr_price - max_sma[-1]) / (min_sma[-1] - max_sma[-1])
+        wt = (curr_price - max_sma.iloc[-1]) / (min_sma.iloc[-1] - max_sma.iloc[-1])
         strat_result.set_weight(wt)
 
         self.min_sma = min_sma
@@ -145,11 +145,11 @@ class Bollinger(Strategy):
 
         strategy_result = StrategyResult(self.strategy_name)
 
-        curr_price = self.data[self.name][-1]
+        curr_price = self.data[self.name].iloc[-1]
 
-        current_mean = rolling_agg['mean'][-1]
-        upper_sd = current_mean + rolling_agg['std'][-1] * self.nstds
-        lower_sd = current_mean - rolling_agg['std'][-1] * self.nstds
+        current_mean = rolling_agg['mean'].iloc[-1]
+        upper_sd = current_mean + rolling_agg['std'].iloc[-1] * self.nstds
+        lower_sd = current_mean - rolling_agg['std'].iloc[-1] * self.nstds
 
         if curr_price > upper_sd:
             strategy_result.set_sell()
@@ -188,11 +188,11 @@ class StochasticOscillator(Strategy):
 
         strg = StrategyResult(self.strategy_name)
 
-        strg.set_weight(K[-1])
+        strg.set_weight(K.iloc[-1])
 
-        if K[-1] > 80:
+        if K.iloc[-1] > 80:
             strg.set_sell()
-        elif K[-1] < 20:
+        elif K.iloc[-1] < 20:
             strg.set_buy()
         else:
             strg.set_watch()
@@ -221,27 +221,27 @@ class Macd(Strategy):
         return self.macd, self.signal
 
     def execute(self):
-        ema_min = pd.ewma(self.data[self.name], span=self.min_period)
-        ema_max = pd.ewma(self.data[self.name], span=self.max_period)
+        ema_min = self.data[self.name].ewm(com=0.5).mean()  # pd.ewma(self.data[self.name], span=self.min_period)
+        ema_max = self.data[self.name].ewm(com=0.5).mean()  # pd.ewma(self.data[self.name], span=self.max_period)
 
         macd = ema_min - ema_max
-        signal = pd.ewma(macd, span=self.signal_period)
+        signal = macd.ewm(com=0.5).mean()  # pd.ewma(macd, span=self.signal_period)
 
         self.macd = macd
         self.signal = signal
 
         strg = StrategyResult(self.strategy_name)
 
-        if macd[-2] < signal[-2] and macd[-1] > signal[-1]:
+        if macd.iloc[-2] < signal.iloc[-2] and macd.iloc[-1] > signal.iloc[-1]:
             strg.set_buy()
-        elif macd[-2] > signal[-2] and macd[-1] < signal[-1]:
+        elif macd.iloc[-2] > signal.iloc[-2] and macd.iloc[-1] < signal.iloc[-1]:
             strg.set_sell()
-        elif macd[-1] > signal[-1]:
+        elif macd.iloc[-1] > signal.iloc[-1]:
             strg.set_strategy('watch and buy')
-            strg.set_weight(macd[-1] / signal[-1])
-        elif macd[-1] < signal[-1]:
+            strg.set_weight(macd.iloc[-1] / signal.iloc[-1])
+        elif macd.iloc[-1] < signal.iloc[-1]:
             strg.set_strategy('sell')
-            strg.set_weight(signal[-1] / macd[-1])
+            strg.set_weight(signal.iloc[-1] / macd.iloc[-1])
 
         return strg
 
@@ -261,7 +261,7 @@ class Vwap(Strategy):
     def execute(self):
         vwd = self.vwap(self.data[-self.period:][self.name], self.data[-self.period:][self.vol_col])
 
-        close_price = self.data[self.name][-1]
+        close_price = self.data[self.name].iloc[-1]
         strategy_result = StrategyResult('VWAP')
 
         wt = (close_price / vwd) - 1
@@ -322,12 +322,12 @@ class Rsi(Strategy):
         self.rsi = rsi
 
         strategy_result = StrategyResult('RSI')
-        if rsi[-1] < 20:
+        if rsi.iloc[-1] < 20:
             strategy_result.set_buy()
-        elif rsi[-1] >= 80:
+        elif rsi.iloc[-1] >= 80:
             strategy_result.set_sell()
 
-        strategy_result.set_weight(rsi[-1])
+        strategy_result.set_weight(rsi.iloc[-1])
 
         return strategy_result
 

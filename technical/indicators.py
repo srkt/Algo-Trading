@@ -42,7 +42,8 @@ def Ema(data, name, period):
     if not isinstance(data, pd.DataFrame):
         raise Exception('Invalid data passed , expecting pandas data frame')
 
-    return pd.ewma(data[name], span=period)
+#    return pd.ewma(data[name], span=period)
+    return data[name].ewm(com=0.5).mean()
 
 
 def Macd(data, name, minperiod, maxperiod, signalperiod):
@@ -66,7 +67,8 @@ def Macd(data, name, minperiod, maxperiod, signalperiod):
 
     macd = minema - maxema
 
-    signal = pd.ewma(macd, span=signalperiod)
+    # signal = pd.ewma(macd, span=signalperiod)
+    signal = macd.ewm(com=0.5).mean()
 
     return macd, signal
 

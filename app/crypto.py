@@ -6,7 +6,7 @@ from tzlocal import get_localzone
 
 import util.keys as util
 from technical.indicators import get_alphabeta
-from trading.binance_exchange import Binance
+from trading.binance_api import Binance
 from util.utility import py_mail, RunScreener
 
 coin_pairs = ['BTCETH', 'BTCXRP', 'BTCADA', 'BTCXVG', 'BTCXLM', 'BTCTRX']

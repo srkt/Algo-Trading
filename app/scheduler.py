@@ -1,13 +1,13 @@
 import schedule
 import time
 
-from app.crypto import generate_crypto_alerts
+# from app.crypto import generate_crypto_alerts
 from app.equities import generate_stock_alerts
 
 crypto_duration = 0.1  # 15  # in minutes
 stock_duration = 0.1  # 12 * 60  # in minutes
 
-schedule.every(crypto_duration).minutes.do(generate_crypto_alerts)
+# schedule.every(crypto_duration).minutes.do(generate_crypto_alerts)
 schedule.every(stock_duration).minutes.do(generate_stock_alerts)
 
 while True:

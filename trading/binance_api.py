@@ -2,7 +2,6 @@ from binance.client import Client
 import pandas as pd
 from tzlocal import get_localzone
 import datetime as dt
-
 from trading.exchange import Exchange
 
 

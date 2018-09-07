@@ -1,18 +1,17 @@
 import matplotlib.pyplot as plt
-import util.keys as util
 import technical.indicators as ind
 import technical.screener as sc
 import pandas as pd
 import datetime as dt
-
-from trading.binance_api import Binance
 from trading.pandas_data_reader_api import StockExchange
+from trading.quandl_api import QuandlStockData
+from trading.stooq_api import StooqExchange
 
 
 def get_stockdata(ticker='sq'):
-    start = dt.datetime(2017, 7, 1)
+    start = dt.datetime(2018, 1, 1)
     end = dt.datetime.now()
-    se = StockExchange()
+    se = StockExchange(source='stooq')  # QuandlStockData()
     data = se.get_data(ticker, start, end)
     return data
 
@@ -33,32 +32,6 @@ def get_data_from_csv(path, ticker):
     data = pd.DataFrame.from_csv(fp)
 
     return data
-
-
-def get_exc_info():
-    key, secret = util.ks()
-    sample = Binance(key, secret)
-    info = sample.getExchangeInfo()
-    print(info)
-
-
-def get_ticker_info():
-    key, secret = util.ks()
-    sample = Binance(key, secret)
-    info = sample.get_all_tickers()
-    print(info.head(100))
-
-
-def get_data():
-    key, secret = util.ks()
-    coin_pair = 'BTCETH'
-    path = "C:\Users\suman\Desktop\\" + coin_pair + ".csv"
-    sample = Binance(key, secret)
-    # df = sample.get_klines(Client.KLINE_INTERVAL_1DAY, 'BTC', 'ADA')
-    df = sample.get_data(coin_pair, dt.datetime(2017, 11, 1), dt.datetime.now())
-
-    save_data(df, path)
-    return df
 
 
 def test_macd(df):
@@ -110,7 +83,7 @@ def RunScreener(df, ticker_name):
         print('Strategy : ' + result.strategy_name + ', signal : ' + result.buy_sell + ', weight: ' + str(
             result.weight))
 
-    print('Current price:' + str(df[close_column][-1]))
+    print('Current price:' + str(df[close_column].iloc[-1]))
 
     fig = plt.figure(figsize=(16, 16))
     plt.title(ticker_name)
@@ -148,12 +121,33 @@ def RunScreener(df, ticker_name):
 
 # get_ticker_info()
 
+ticker = ['COG.US',
+          'CY.US'
+          'VOD.US',
+          'HST.US',
+          'INFY.US',
+          'EXEL.US',
+          'MRVL.US',
+          'ABEV.US',
+          'CRON.US',
+          'CTL.US',
+          'IPG.US',
+          'STM.US',
+          'ON.US',
+          'HBI.US',
+          'VIPS.US',
+          'ARNC.US',
+          'ETE.US',
+          'SLCA.US']
 
-tickers = ['ABEV']
-data = get_stockdata(tickers)
-for sdata in data:
-    path = "C:\Users\suman\Desktop\Stocks\{}.csv".format(sdata[0])
-    save_data(sdata[1], path)
-    fig = RunScreener(sdata[1], sdata[0])
-    img = "C:\Users\suman\Desktop\Stocks\{}.png".format(sdata[0])
+ticker = ['ETE.US', 'SLCA.US']
+listofstockdata = get_stockdata(ticker)
+for stockinfo in listofstockdata:
+    ticker = stockinfo[0]
+    stockDataframe = stockinfo[1]
+    path = "C:\\Users\\suman\\Desktop\\Stocks\\{}.csv".format(ticker)
+    save_data(stockDataframe, path)
+    # print(stockinfo[0] + ' size : ' + str(stockinfo[1].size))
+    fig = RunScreener(stockDataframe, ticker)
+    img = "C:\\Users\\suman\\Desktop\\Stocks\\{}.png".format(ticker)
     fig.savefig(img)
