@@ -1,17 +1,15 @@
-import matplotlib.pyplot as plt
-import technical.indicators as ind
-import technical.screener as sc
-import pandas as pd
 import datetime as dt
+import matplotlib.pyplot as plt
+import pandas as pd
+import technical.indicators as ind
+import technical.screener2 as sc
 from trading.pandas_data_reader_api import StockExchange
-from trading.quandl_api import QuandlStockData
-from trading.stooq_api import StooqExchange
 
 
 def get_stockdata(ticker='sq'):
-    start = dt.datetime(2018, 1, 1)
+    start = dt.datetime(2018, 9, 1)
     end = dt.datetime.now()
-    se = StockExchange(source='stooq')  # QuandlStockData()
+    se = StockExchange(source='MORNINGSTAR')  # QuandlStockData()
     data = se.get_data(ticker, start, end)
     return data
 
@@ -121,33 +119,36 @@ def RunScreener(df, ticker_name):
 
 # get_ticker_info()
 
-ticker = ['COG.US',
-          'CY.US'
-          'VOD.US',
-          'HST.US',
-          'INFY.US',
-          'EXEL.US',
-          'MRVL.US',
-          'ABEV.US',
-          'CRON.US',
-          'CTL.US',
-          'IPG.US',
-          'STM.US',
-          'ON.US',
-          'HBI.US',
-          'VIPS.US',
-          'ARNC.US',
-          'ETE.US',
-          'SLCA.US']
+ticker = ['COG',
+          'CY',
+          'VOD',
+          'HST',
+          'INFY',
+          'EXEL',
+          'MRVL',
+          'ABEV',
+          'CRON',
+          'CTL',
+          'IPG',
+          'STM',
+          'ON',
+          'HBI',
+          'VIPS',
+          'ARNC',
+          'ETE',
+          'SLCA']
 
-ticker = ['ETE.US', 'SLCA.US']
+ticker = ['SQ', 'MSFT']
+ticker = 'MA'
 listofstockdata = get_stockdata(ticker)
+print(listofstockdata)
 for stockinfo in listofstockdata:
     ticker = stockinfo[0]
     stockDataframe = stockinfo[1]
     path = "C:\\Users\\suman\\Desktop\\Stocks\\{}.csv".format(ticker)
     save_data(stockDataframe, path)
     # print(stockinfo[0] + ' size : ' + str(stockinfo[1].size))
-    fig = RunScreener(stockDataframe, ticker)
+    data = stockDataframe.head(180)
+    fig = RunScreener(data[::-1], ticker)
     img = "C:\\Users\\suman\\Desktop\\Stocks\\{}.png".format(ticker)
     fig.savefig(img)

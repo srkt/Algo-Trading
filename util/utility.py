@@ -2,6 +2,7 @@ import pandas as pd
 
 from technical.screener import EmaReversion, Bollinger, StochasticOscillator, Macd, Vwap, Rsi, Screener
 
+
 def RunScreener(df, close_column='close', volume_column='volume'):
     if not isinstance(df, pd.DataFrame):
         raise Exception('Dataframe expected')
@@ -41,3 +42,25 @@ def RunScreener(df, close_column='close', volume_column='volume'):
 
     # print('Current price:' + str(df[close_column][-1]))
     return result_list
+
+
+def ReadFile(path, delimiter):
+    return pd.read_csv(path, delimiter=delimiter)
+
+
+def to_excel(df, path, sheetName='Sheet1'):
+    writer = pd.ExcelWriter(path)
+    df.to_excel(writer, sheetName)
+    writer.save()
+
+
+class Excel:
+
+    def __init__(self, path):
+        self.writer = pd.ExcelWriter(path)
+
+    def generate(self, df, sheetName):
+        df.to_excel(self.writer, sheetName)
+
+    def save(self):
+        self.writer.save()
