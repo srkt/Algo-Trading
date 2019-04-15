@@ -1,3 +1,0 @@
-    username = 'mytrademailer@gmail.com'
-    password = 'Tr@deMailer'
-    Quandl Key API_KEY = 'rwcM5he_sxH2VoscWvsT'  # '4HyLLeq1LKXyUxZdL61p' #
